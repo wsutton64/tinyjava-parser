@@ -5,9 +5,9 @@ public class Main {
     private TJScanner scanner;
     private TJParser parser;
     private TJChario chario;
+    private String filePath;
 
     public Main(String[] args) {
-        String filePath;
         // Check the arguments
         if (args.length > 1) {
             // User submitted more than just a filepath
