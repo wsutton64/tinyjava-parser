@@ -15,7 +15,9 @@ public class TJParser {
         // Start the parsing process
         chario.putMessage("\nStart parsing...");
         program();
+        // If program gets to this point, Parsing is complete
         chario.putMessage("Parsing Complete.\n\nPostfix:");
+        // Print out all of the postfix elements for the user to see
         for (String element : postfix.getList()) {
             chario.putMessage(element);
         }
@@ -42,13 +44,13 @@ public class TJParser {
      */
     private void block() {
         expectedValue("{");
-        table.enterScope();
+        //table.enterScope();
         // Keep parsing statements until it reaches "}"
         while(scanner.getToken().getType() != Token.TokenType.PUNCTUATION) {
             statement();
         }
         expectedValue("}");
-        table.exitScope();
+        //table.exitScope();
     }
 
     /*
@@ -90,11 +92,12 @@ public class TJParser {
      * if-statement -> "if" "(" equivalence ")" block
      */
     private void ifStatement() {
+        // Make sure all of the elements of the if-statement are in order
         expectedValue("if");
         expectedValue("(");
-        //postfix.add("equivalence");
         equivalence();
         expectedValue(")");
+        // Equivalence will get the operands. After, add "ifT" for the block
         postfix.add("ifT");
         block();
         postfix.submit();
@@ -105,15 +108,17 @@ public class TJParser {
      *                          datatype assignment-statement ";"
      */
     private void declarationStatement() {
+        // Make sure all elements of the declaration statement are in order
         datatype();
-        //String identifier = token.getValue();
         identifier();
-        //SymbolEntry entry = table.enterSymbol(identifier);
         if (token.getValue().equals("=")) {
+            // If the current token is '=', it must be a declaration statement that assigns a value.
             assignmentStatement();
         } else if(token.getType() == Token.TokenType.NUMBER) {
+            // If the token is a number, there is a missing '='
             syntaxError("Missing '='");
         } else {
+            // Submit as it will just be the identifier and expect ';'
             postfix.submit();
             expectedValue(";");
         }
@@ -124,18 +129,24 @@ public class TJParser {
      */
     private void assignmentStatement() {
         if (!token.getValue().equals("=")) {
+            // If the token is not '=', then the method must not have been called from declarationStatement()
+            // Get the identifier
             identifier();
         }
-        //expectedValue("=");
         if (!token.getValue().matches("=|\\+=|\\-=|\\*=|\\%=|\\/=")) {
+            // Make sure the token is a recognized operator.
             syntaxError("Expected assignment operator. Found: " + token.getValue());
         }
+        // Save the operator and move onto the next token
         String operator = token.getValue();
         scanner.nextToken();
         token = scanner.getToken();
+        // Get the following expression
         expression();
+        // Add the operator to the postfix line and submit
         postfix.add(operator);
         postfix.submit();
+        // Expect the statement to end with ';'
         expectedValue(";");
     }
 
@@ -143,6 +154,7 @@ public class TJParser {
      * datatype -> int | double
      */
     private void datatype() {
+        // Just check if datatype is 'int' or 'double', then check to make sure token has a KEYWORD tokentype
         if (!token.getValue().equals("int") && !token.getValue().equals("double")) {
             syntaxError("Invalid Datatype. Expected 'int' or 'double'. Got: " + token.getValue());
         }
@@ -153,6 +165,7 @@ public class TJParser {
      * identifier -> (letter | "_") (letter | digit | "_")*
      */
     private void identifier() {
+        // Save the identifier, make sure the token is valid, then add it to the postfix string
         String id = token.getValue();
         expectedType(Token.TokenType.IDENTIFIER);
         postfix.add(id);
@@ -162,13 +175,17 @@ public class TJParser {
      * equivalence -> expression (">" | "<" | "==" | "<=" | ">=" | "!=") expression
      */
     private void equivalence() {
+        // Parse the first expression
         expression();
-        //expectedValue("");
+        // Make sure equivlance uses an appropriate equivalence operator
         if (token.getValue().matches("<|>|<=|>=|==|!=")) {
+            // Save the operator and move onto the next token
             String operator = token.getValue();
             scanner.nextToken();
             token = scanner.getToken();
+            // Parse the next expression
             expression();
+            // Add the operator to the postfix string and submit
             postfix.add(operator);
             postfix.submit();
         } else {
@@ -182,17 +199,19 @@ public class TJParser {
      *               term
      */
     private void expression() {
+        // Parse the first term of the expression
         term();
-        //postfix.add(token.getValue());
-        while (token.getValue().matches("\\+|\\-|\\+=|\\-=")) {
+        if (token.getValue().matches("\\+|\\-|\\+=|\\-=")) {
+            // If the next token is a recognized operator, save it and move onto the next token
             String operator = token.getValue();
-            //expectedValue("");
             scanner.nextToken();
             token = scanner.getToken();
+            // Parse the next term
             term();
+            // Add the operator to the postfix string and submit
             postfix.add(operator);
             postfix.submit();
-        }
+        } // No else because an expression may boil down to just a number
     }
 
     /*
@@ -200,15 +219,18 @@ public class TJParser {
      *         factor
      */
     private void term() {
+        // Parse the first factor of the term
         factor();
-        //postfix.add(token.getValue());
-        while (token.getValue().matches("\\/|\\*|\\%|\\/=|\\*=|\\%=")) {
+        if (token.getValue().matches("\\/|\\*|\\%|\\/=|\\*=|\\%=")) {
+            // if the next token is a recognized operator, save it and move onto the next token
             String operator = token.getValue();
-            //expectedValue("");
             scanner.nextToken();
             token = scanner.getToken();
-            postfix.add(operator);
+            // Parse the next factor
             factor();
+            // Add the operator to the postfix string
+            postfix.add(operator);
+            // There is no submit here as it will be in expression()
         }
     }
 
@@ -217,6 +239,7 @@ public class TJParser {
      *           number
      */
     private void factor() {
+        // Check if the factor is a parenthesised expression, a number, or an identifier
         if (token.getValue().equals("(")) {
             expectedValue("(");
             expression();
@@ -234,6 +257,7 @@ public class TJParser {
      *           digit
      */
     private void number() {
+        // Save the number, check the token, then add it to the postfix string
         String num = token.getValue();
         expectedType(Token.TokenType.NUMBER);
         postfix.add(num);
