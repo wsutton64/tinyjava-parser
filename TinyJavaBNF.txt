@@ -1,0 +1,24 @@
+Tiny Java BNF
+
+" "	    enclose literal items
+ *    	indicates zero or more occurrences 
+ |     	indicates a choice
+( )  	enclose a required choice
+[ ]  	enclose items which may be omitted
+
+program → block*
+block → "{" statement* "}"
+statement → if-statement | declaration-statement | assignment-statement
+if-statement → "if” "(" equivalence ")" block
+declaration-statement → datatype identifier ";" | datatype assignment-statement ";"
+assignment-statement → identifier "=" expression ";"
+keyword → datatype | if
+datatype → int | double
+identifier → (letter | "_") (letter | digit | "_")*
+equivalence → expression (">" | "<" | "==" | "<=" | ">=" | "!=") expression
+expression → expression ("+" | "-") term | term
+term → term ("*" | "/" | "%") factor | factor
+factor → "(" expression ")" | number
+number → number digit | number "." number | digit
+digit → 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+letter → [a-z] | [A-Z]

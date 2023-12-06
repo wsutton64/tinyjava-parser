@@ -1,0 +1,12 @@
+{
+    if (x > 0) {
+        if (y <= var) 
+            int a = 10;
+            int b = 20;
+            int c = a % b;
+        }
+        double k = 10.0;
+        int i = 10;
+        i %= 2;
+    }
+}

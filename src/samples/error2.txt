@@ -1,0 +1,10 @@
+{    
+    int variable;
+    variable = 3;
+
+    int y = 30.0.0;
+
+    if (variable &= y) {
+        variable = 0;
+    }
+}

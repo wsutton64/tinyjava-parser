@@ -1,0 +1,10 @@
+{
+    int _variable_;
+    _variable_ = 3;
+
+    int y = 30000000;
+
+    if (variable >= y) {
+        variable = 0;
+    }
+}

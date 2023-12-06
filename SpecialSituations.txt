@@ -1,0 +1,1 @@
+As this compiler does not include datatype checking, it is possible to write something like "int x = 3.14" and it will be accepted.
