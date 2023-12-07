@@ -44,13 +44,15 @@ public class TJParser {
      */
     private void block() {
         expectedValue("{");
-        //table.enterScope();
+        // Enter scope of a block
+        table.enterScope();
         // Keep parsing statements until it reaches "}"
         while(scanner.getToken().getType() != Token.TokenType.PUNCTUATION) {
             statement();
         }
         expectedValue("}");
-        //table.exitScope();
+        // Exit scope of the block
+        table.exitScope();
     }
 
     /*
@@ -110,7 +112,9 @@ public class TJParser {
     private void declarationStatement() {
         // Make sure all elements of the declaration statement are in order
         datatype();
+        String name = token.getValue();
         identifier();
+        table.enterSymbol(name);
         if (token.getValue().equals("=")) {
             // If the current token is '=', it must be a declaration statement that assigns a value.
             assignmentStatement();
